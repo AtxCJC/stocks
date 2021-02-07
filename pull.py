@@ -7,14 +7,14 @@ import requests
 tickers = {'SQQQ', 'NOK', 'IDEX', 'AMD'}
 
 # puts list of tickers into folder as html request
-# for name in tickers:
-#     get = "wget -O ./tickers/"
-#     url = " https://stockinvest.us/stock/"
-#     get = get + name + '.html'
-#     url = url + name
-#     getURL = get + url
-#     print(getURL)
-#     os.system(getURL)
+for name in tickers:
+    get = "wget -O ./tickers/"
+    url = " https://stockinvest.us/stock/"
+    get = get + name + '.html'
+    url = url + name
+    getURL = get + url
+    print(getURL)
+    os.system(getURL)
 
 # reading 90% chance between
 for name in tickers:

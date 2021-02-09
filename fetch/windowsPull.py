@@ -7,7 +7,7 @@ import csv
 from datetime import date
 import pandas as pd
 
-tickers = ['SQQQ', 'NOK', 'IDEX', 'AMD']
+tickers = ['SQQQ', 'NOK', 'IDEX', 'AMD', 'BTCUSD']
 ticker = list(tickers)
 
 # puts list of tickers into folder as html request
@@ -28,19 +28,14 @@ for name in tickers:
     with open(location) as html_file:
         soup = BeautifulSoup(html_file, 'lxml')
 
-    # today as the csv name
-    today = date.today()
-    today = str(today)
-    today += "_stocks.csv"
-    # open csv to write
-    with open("../" + today, mode='w') as my_csv:
-        wr = csv.writer(my_csv, delimiter=',', quotechar="'", quoting=csv.QUOTE_MINIMAL)
-        wr.writerow(tickers)
+    # name list
+    exec(name+'=[]')
 
     # rating score
     score = soup.find('div', class_='gauge pull-right exampleDynamicGauge')
     score = score.attrs.get('data-value')
     print(score)
+    exec(name+'.append(score)')
 
     # 90% chance between first and second
     first = soup.find_all('p', class_="text-justified")[1].find_all('strong')[1].text
@@ -51,6 +46,10 @@ for name in tickers:
     else:
         second = soup.find_all('p', class_="text-justified")[1].find_all('strong')[2].text
     print(first, second)
+    first = str(first)
+    second = str(second)
+    hold = first + " to " + second
+    exec(name+'.append(hold)')
 
     # opening price
     try: 
@@ -58,6 +57,7 @@ for name in tickers:
     except Exception as e:
         opening = soup.find('div', class_="col-lg-5 col-md-12").find('span', class_="text-success bold").text
     print(opening)
+    exec(name+'.append(opening)')
 
     # RSI
     rsi = soup.find('small', class_="mb-0 mt-5").find('strong').text
@@ -66,5 +66,15 @@ for name in tickers:
     except ValueError:
         rsi = soup.find('small', class_="mb-0 mt-5").find_all('strong')[1].text
     print(rsi)
+    exec(name+'.append(rsi)')
 
 
+# dataframe
+# today as the csv name
+today = date.today()
+today = str(today)
+today += "_stocks.csv"
+data = {'SQQQ':SQQQ, 'NOK':NOK, 'IDEX':IDEX, 'AMD':AMD, 'BTCUSD':BTCUSD}
+types = ['Score', '3_Month_Hold', 'Opening_Price', 'RSI']
+df = pd.DataFrame(data, index=types)
+df.to_csv("../" + today)

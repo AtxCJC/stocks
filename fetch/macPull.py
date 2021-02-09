@@ -8,7 +8,7 @@ tickers = {'SQQQ', 'NOK', 'IDEX', 'AMD'}
 
 # puts list of tickers into folder as html request
 for name in tickers:
-    get = "wget -O ./tickers/"
+    get = "curl -O ./tickers/"
     url = " https://stockinvest.us/stock/"
     get = get + name + '.html'
     url = url + name
@@ -18,7 +18,7 @@ for name in tickers:
 
 # reading 90% chance between
 for name in tickers:
-    location = './tickers/'
+    location = '../tickers/'
     location = location + name + '.html'
     print(location)
     with open(location) as html_file:
@@ -37,4 +37,3 @@ for name in tickers:
     else:
         second = soup.find_all('p', class_="text-justified")[1].find_all('strong')[2].text
     print(first, second)
-

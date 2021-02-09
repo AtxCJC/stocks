@@ -8,7 +8,7 @@ tickers = {'SQQQ', 'NOK', 'IDEX', 'AMD'}
 
 # puts list of tickers into folder as html request
 for name in tickers:
-    get = "curl -O ./tickers/"
+    get = "curl -O ../tickers/"
     url = " https://stockinvest.us/stock/"
     get = get + name + '.html'
     url = url + name

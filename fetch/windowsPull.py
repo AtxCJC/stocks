@@ -7,6 +7,7 @@ import csv
 from datetime import date
 import pandas as pd
 import time
+from datetime import datetime, timedelta
 
 tickers = ['SQQQ', 'NOK', 'IDEX', 'AMD', 'BTCUSD', 'FBIO', 'SONM']
 ticker = list(tickers)
@@ -22,6 +23,20 @@ ticker = list(tickers)
 #     os.system(getURL)
 #     time.sleep(1)
 
+last = date.today() - timedelta(days=1)
+last = str(last)
+last = "../outputs/" + last + "_stocks.csv"
+df_past = pd.read_csv(last)
+past = []
+
+# for name in tickers:
+#     try:
+#         print(df_past.iloc[0][name])
+#         past.append(df_past.iloc[0][name])
+#     except KeyError:
+#         print("NA")
+#         past.append("NA")
+# print(past)
 
 for name in tickers:
     location = '../tickers/'
@@ -33,9 +48,26 @@ for name in tickers:
     # name list
     exec(name+'=[]')
 
+    try:
+        past = (df_past.iloc[0][name])
+    except KeyError:
+        past = "NA"
+
     # rating score
     score = soup.find('div', class_='gauge pull-right exampleDynamicGauge')
     score = score.attrs.get('data-value')
+    if score < past and past != 'NA':
+        score, past = float(score), float(past)
+        dif = abs(past - score)
+        score, past, dif = str(score), str(past), str(round(dif, 2))
+        score = score + "  DOWN - " + dif
+    elif score > past and past != 'NA':
+        score, past = float(score), float(past)
+        dif = abs(score - past)
+        score, past, dif = str(score), str(past), str(round(dif, 2))
+        score = score + "  UP + " + dif
+    else:
+        score = score + "  SAME "
     print(score)
     exec(name+'.append(score)')
 
@@ -53,7 +85,7 @@ for name in tickers:
     print(first, second)
     first = str(first)
     second = str(second)
-    hold = first + " to " + second
+    hold = first + " - " + second
     exec(name+'.append(hold)')
 
     # opening price
@@ -73,6 +105,14 @@ for name in tickers:
     print(rsi)
     exec(name+'.append(rsi)')
 
+    # append past
+    try:
+        past = (df_past.iloc[0][name])
+        exec(name+'.append(past)')
+    except KeyError:
+        past = "NA"
+        exec(name+'.append(past)')
+
 
 # dataframe
 # today as the csv name
@@ -80,6 +120,6 @@ today = date.today()
 today = str(today)
 today += "_stocks.csv"
 data = {'SQQQ':SQQQ, 'NOK':NOK, 'IDEX':IDEX, 'AMD':AMD, 'BTCUSD':BTCUSD, 'FBIO':FBIO, 'SONM':SONM}
-types = ['Score', '3_Month_Hold', 'Opening_Price', 'RSI']
+types = ['Score', '3_Month_Hold', 'Opening_Price', 'RSI', 'Day_1']
 df = pd.DataFrame(data, index=types)
-df.to_csv("../" + today)
+df.to_csv("../outputs/" + today)

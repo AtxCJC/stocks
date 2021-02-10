@@ -6,19 +6,21 @@ import requests
 import csv
 from datetime import date
 import pandas as pd
+import time
 
-tickers = ['SQQQ', 'NOK', 'IDEX', 'AMD', 'BTCUSD']
+tickers = ['SQQQ', 'NOK', 'IDEX', 'AMD', 'BTCUSD', 'FBIO', 'SONM']
 ticker = list(tickers)
 
 # puts list of tickers into folder as html request
-for name in tickers:
-    get = "wget -O ../tickers/"
-    url = " https://stockinvest.us/stock/"
-    get = get + name + '.html'
-    url = url + name
-    getURL = get + url
-    print(getURL)
-    os.system(getURL)
+# for name in tickers:
+#     get = "wget -O ../tickers/"
+#     url = " https://stockinvest.us/stock/"
+#     get = get + name + '.html'
+#     url = url + name
+#     getURL = get + url
+#     print(getURL)
+#     os.system(getURL)
+#     time.sleep(1)
 
 
 for name in tickers:
@@ -44,7 +46,10 @@ for name in tickers:
         first = soup.find_all('p', class_="text-justified")[1].find_all('strong')[2].text
         second = soup.find_all('p', class_="text-justified")[1].find_all('strong')[3].text
     else:
-        second = soup.find_all('p', class_="text-justified")[1].find_all('strong')[2].text
+        try:
+            second = soup.find_all('p', class_="text-justified")[1].find_all('strong')[2].text
+        except IndexError as e:
+            first, second = "NA", ""
     print(first, second)
     first = str(first)
     second = str(second)
@@ -74,7 +79,7 @@ for name in tickers:
 today = date.today()
 today = str(today)
 today += "_stocks.csv"
-data = {'SQQQ':SQQQ, 'NOK':NOK, 'IDEX':IDEX, 'AMD':AMD, 'BTCUSD':BTCUSD}
+data = {'SQQQ':SQQQ, 'NOK':NOK, 'IDEX':IDEX, 'AMD':AMD, 'BTCUSD':BTCUSD, 'FBIO':FBIO, 'SONM':SONM}
 types = ['Score', '3_Month_Hold', 'Opening_Price', 'RSI']
 df = pd.DataFrame(data, index=types)
 df.to_csv("../" + today)

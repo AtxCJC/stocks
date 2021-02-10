@@ -23,7 +23,8 @@ ticker = list(tickers)
 #     os.system(getURL)
 #     time.sleep(1)
 
-last = date.today() - timedelta(days=1)
+# last = date.today() - timedelta(days=1)
+last = '2021-02-08'
 last = str(last)
 last = "../outputs/" + last + "_stocks.csv"
 df_past = pd.read_csv(last)
@@ -56,20 +57,35 @@ for name in tickers:
     # rating score
     score = soup.find('div', class_='gauge pull-right exampleDynamicGauge')
     score = score.attrs.get('data-value')
-    if score < past and past != 'NA':
-        score, past = float(score), float(past)
-        dif = abs(past - score)
-        score, past, dif = str(score), str(past), str(round(dif, 2))
-        score = score + "  DOWN - " + dif
-    elif score > past and past != 'NA':
-        score, past = float(score), float(past)
-        dif = abs(score - past)
-        score, past, dif = str(score), str(past), str(round(dif, 2))
-        score = score + "  UP + " + dif
-    else:
-        score = score + "  SAME "
     print(score)
     exec(name+'.append(score)')
+
+    
+    # dif
+    try:
+        score, past = float(score), float(past)
+        if float(score) > float(past) and past != 'NA':
+            print(score, ">", past)
+            dif = score - past
+            dif = str(abs((round(dif, 2))))
+            dif = "UP+ " + dif
+            print(dif)
+            exec(name+'.append(dif)')
+        elif float(score) < float(past) and past != 'NA':
+            print(score, "<", past)
+            dif = past - score
+            dif = str(abs((round(dif, 2))))
+            dif = "DOWN- " + dif
+            print(dif)
+            exec(name+'.append(dif)')
+    except ValueError:
+        score, dif = float(score), str(score)
+        dif = "SAME " + dif
+        print(dif)
+        exec(name+'.append(dif)')
+    
+    
+    
 
     # 90% chance between first and second
     first = soup.find_all('p', class_="text-justified")[1].find_all('strong')[1].text
@@ -108,18 +124,21 @@ for name in tickers:
     # append past
     try:
         past = (df_past.iloc[0][name])
+        print(past)
         exec(name+'.append(past)')
     except KeyError:
         past = "NA"
+        print(past)
         exec(name+'.append(past)')
 
 
 # dataframe
 # today as the csv name
-today = date.today()
+# today = date.today()
+today = '2021-02-09'
 today = str(today)
 today += "_stocks.csv"
+types = ['Score', 'Score_Dif', '3_Month_Hold', 'Opening_Price', 'RSI', 'Day_1']
 data = {'SQQQ':SQQQ, 'NOK':NOK, 'IDEX':IDEX, 'AMD':AMD, 'BTCUSD':BTCUSD, 'FBIO':FBIO, 'SONM':SONM}
-types = ['Score', '3_Month_Hold', 'Opening_Price', 'RSI', 'Day_1']
 df = pd.DataFrame(data, index=types)
 df.to_csv("../outputs/" + today)
